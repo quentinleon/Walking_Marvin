@@ -8,3 +8,7 @@ class link:
 class node:
 	id = 0
 	node_type = ""
+
+class individual:
+	nodes = []
+	links = []
