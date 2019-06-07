@@ -1,5 +1,6 @@
 import gym
 import structures
+import quentin
 env = gym.make('Marvin-v0')
 
 print("Action space info")
@@ -13,6 +14,8 @@ print(env.observation_space)
 print(env.observation_space.high)
 print(env.observation_space.low)
 
+meme:structures.Individual = 0
+
 for i_episode in range(5):
 	observation = env.reset()
 	t = 0
@@ -20,6 +23,7 @@ for i_episode in range(5):
 		t += 1
 		env.render()
 		action = env.action_space.sample()
+		quentin.ComputeOutputs(meme, observation)
 		observation, reward, done, info = env.step(action)
 		if done:
 			print("Episode finished after {} timesteps".format(t+1))

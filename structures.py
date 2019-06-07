@@ -1,4 +1,5 @@
 from enum import Enum
+
 class Link:
 	innovation_num = -1
 	start_node = 0
@@ -14,8 +15,8 @@ class NodeType(Enum):
 	HIDDEN = 4
 
 class Node:
-	id = 0
-	node_type = NodeType.NONE
+	nid = 0
+	nodeType = NodeType.NONE
 
 class Individual:
 	nodes = []
