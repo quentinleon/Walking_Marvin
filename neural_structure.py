@@ -1,4 +1,3 @@
-from gym import spaces
 import numpy as np
 from structures import Individual, Node, NodeType, Link
 
