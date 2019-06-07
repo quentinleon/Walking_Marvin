@@ -1,12 +1,12 @@
 from structures import *
 from neural_structure import NeuralStructure
 import random
-import copy
 import gym
 
 ## Inits Links for clean state individuals
 ## starts with no seed. seed when we need it.
-def InitLinks(indi: Individual, gl: Global, linkChance: float = 0.5):
+def InitLinks(indi: Individual, gl: Global, linkChance: float = 0.2):
+	random.seed()
 	edge = Edge()
 	edge.start = 0
 	while edge.start < gl.nInput:
@@ -16,13 +16,13 @@ def InitLinks(indi: Individual, gl: Global, linkChance: float = 0.5):
 			if random.random() < linkChance:
 				link = Link()
 				link.innovation_num = gl.GetInnovationNum(edge)
-				link.path = copy.copy(edge)
+				link.path = edge.__copy__()
 				link.weight = random.uniform(-2.0, 2.0)
 				link.enabled = True
 				indi.links.append(link)
 			edge.end += 1
 		edge.start += 1
-	edge = Edge()
+
 
 ## Inits Gen for Generation 1
 def InitGen(nIndividuals: int, nInput: int, nOutput: int):
@@ -32,18 +32,7 @@ def InitGen(nIndividuals: int, nInput: int, nOutput: int):
 	outGlobal.nGen = 1
 	outGlobal.env = gym.make('Marvin-v0')
 
-	print("Action space info")
-	print(outGlobal.env.action_space)
-	print(outGlobal.env.action_space.high)
-	print(outGlobal.env.action_space.low)
-
-	print()
-	print("Observation space info")
-	print(outGlobal.env.observation_space)
-	print(outGlobal.env.observation_space.high)
-	print(outGlobal.env.observation_space.low)
-
-	## Set up for Nodes
+	## Set up for Nodes with defaults	.
 	elem = Individual()
 	#24 input nodes
 	for i in range(nInput):
@@ -53,11 +42,11 @@ def InitGen(nIndividuals: int, nInput: int, nOutput: int):
 	#4 output nodes
 	for i in range(nOutput):
 		elem.nodes.append(outGlobal.NewNode(NodeType.OUTPUT))
+
 	## randomly link them
 	for i in range(nIndividuals):
-		e = copy.copy(elem)
+		e = elem.__copy__()
 		InitLinks(e, outGlobal)
-		## Push to list of individuals
 		outGlobal.individuals.append(e)
 	return outGlobal
 
@@ -73,12 +62,12 @@ def RunGen(gl: Global):
 
 		## Run till the end of the world
 		t = 0
+		#print(len(indi.links))
 		while True:
 			t += 1
 			gl.env.render()
-			
 			action = neuralStruct.ComputeOutputs(observed)
-			print (action)
+#			print (action)
 			#gl.env.action_space.sample()
 
 			observed, reward, done, info = gl.env.step(action)

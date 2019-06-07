@@ -1,9 +1,15 @@
 from enum import Enum
 from typing import Dict, List
+import copy
 
 class Edge:
 	start = -1
 	end = -1
+	def __copy__(self):
+		e = Edge()
+		e.start = self.start
+		e.end = self.end
+		return e
 
 class Link:
 	innovation_num = -1
@@ -28,6 +34,12 @@ class Node:
 class Individual:
 	nodes = []
 	links = []
+	def __copy__(self):
+		i = Individual()
+		i.nodes = copy.deepcopy(self.nodes)
+		i.links = [] #not copying links.
+		#i.links = copy.deepcopy(self.links)
+		return i
 
 class Global:
 	individuals = []
