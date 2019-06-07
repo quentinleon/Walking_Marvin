@@ -1,31 +1,7 @@
-import gym
-import structures
-import quentin
-env = gym.make('Marvin-v0')
+import neat
 
-print("Action space info")
-print(env.action_space)
-print(env.action_space.high)
-print(env.action_space.low)
-
-print()
-print("Observation space info")
-print(env.observation_space)
-print(env.observation_space.high)
-print(env.observation_space.low)
-
-meme:structures.Individual = 0
-
-for i_episode in range(5):
-	observation = env.reset()
-	t = 0
-	while True: #t in range(100):
-		t += 1
-		env.render()
-		action = env.action_space.sample()
-		quentin.ComputeOutputs(meme, observation)
-		observation, reward, done, info = env.step(action)
-		if done:
-			print("Episode finished after {} timesteps".format(t+1))
-			break
-env.close()
+gen = neat.InitGen(30, 4, 24)
+while True:
+	scores = neat.RunGen(gen)
+	neat.SetupNextGen(gen, scores)
+	gen.nGet += 1
