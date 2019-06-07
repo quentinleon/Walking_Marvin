@@ -8,6 +8,7 @@ class NeuralStructure:
 	def __init__(self, indiv):
 		self.nodemap = {}
 		self.outputNids = []
+		
 		#read in every node and create a logical node
 		for n in indiv.nodes:
 			self.nodemap[n.nid] = LogicalNode()
@@ -15,6 +16,9 @@ class NeuralStructure:
 			#if it's an output node, log it's id
 			if(n.nodeType == NodeType.OUTPUT):
 				self.outputNids.append(n.nid)
+			#if it's an input node, set it's value to 0
+			elif(n.nodeType == NodeType.BIAS):
+				self.nodemap[n.nid].setCache(0)
 			#if it's a bias node, set it's value to 1
 			elif(n.nodeType == NodeType.BIAS):
 				self.nodemap[n.nid].setCache(1)

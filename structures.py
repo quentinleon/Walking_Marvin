@@ -16,6 +16,9 @@ class Link:
 	path = Edge()
 	weight = 0.0
 	enabled = True
+	def __str__(self):
+		print("\t{weight}")
+		print("{path.start}\t->\t{path.end}")
 
 class NodeType(Enum):
 	NONE = 0
