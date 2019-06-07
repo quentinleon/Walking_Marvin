@@ -6,7 +6,7 @@ import gym
 ## Inits Links for clean state individuals
 ## starts with no seed. seed when we need it.
 def InitLinks(indi: Individual, gl: Global, linkChance: float = 0.2):
-	random.seed()
+	#random.seed()
 	edge = Edge()
 	edge.start = 0
 	while edge.start < gl.nInput:
@@ -67,8 +67,7 @@ def RunGen(gl: Global):
 			t += 1
 			gl.env.render()
 			action = neuralStruct.ComputeOutputs(observed)
-#			print (action)
-			#gl.env.action_space.sample()
+			print (action)
 
 			observed, reward, done, info = gl.env.step(action)
 			if reward > maxScore:

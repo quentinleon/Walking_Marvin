@@ -8,7 +8,7 @@ class NeuralStructure:
 	def __init__(self, indiv):
 		self.nodemap = {}
 		self.outputNids = []
-		
+
 		#read in every node and create a logical node
 		for n in indiv.nodes:
 			self.nodemap[n.nid] = LogicalNode()
@@ -16,12 +16,13 @@ class NeuralStructure:
 			#if it's an output node, log it's id
 			if(n.nodeType == NodeType.OUTPUT):
 				self.outputNids.append(n.nid)
-			#if it's an input node, set it's value to 0
-			elif(n.nodeType == NodeType.BIAS):
-				self.nodemap[n.nid].setCache(0)
 			#if it's a bias node, set it's value to 1
 			elif(n.nodeType == NodeType.BIAS):
 				self.nodemap[n.nid].setCache(1)
+				self.nodemap[n.nid].inputVal = True
+			#if it's an input node, mark it as such
+			elif(n.nodeType == NodeType.INPUT):
+				self.nodemap[n.nid].inputVal = True
 			
 		#read in every link and create dependencies from them
 		for l in indiv.links:
@@ -30,6 +31,10 @@ class NeuralStructure:
 				self.nodemap[l.path.end].addDependency(new_dep)
 
 	def ComputeOutputs(self, input):
+		#clear the cache
+		for _, n in self.nodemap.items():
+			n.cached = False
+
 		#load inputs
 		for i in range(len(input)):
 			self.nodemap[i].setCache(input[i])
@@ -47,21 +52,27 @@ class Dependency:
 	def __init__(self, i, w):
 		self.nid = i
 		self.weight = w
+	def __str__(self):
+		return(f"{self.nid}  {self.weight}")
 
 class LogicalNode:
-	preComputed = False
+	inputVal = False
+	cached = False
 	cachedOutput = 0
 	dependencies = []
+
+	def __init__(self):
+		self.dependencies = []
 
 	def addDependency(self, d):
 		self.dependencies.append(d)
 
 	def setCache(self, n):
 		self.cachedOutput = n
-		self.preComputed = True
+		self.cached = True
 
 	def getOutput(self, nodemap):
-		if not self.preComputed:
+		if not self.cached and not self.inputVal:
 			self.computeNode(nodemap)
 		return self.cachedOutput
 
