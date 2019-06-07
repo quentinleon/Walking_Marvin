@@ -1,4 +1,5 @@
 from structures import *
+import quentin
 import random
 import copy
 import gym
@@ -42,21 +43,22 @@ def InitGen(nIndividuals: int, nInput: int, nOutput: int):
 	print(outGlobal.env.observation_space.high)
 	print(outGlobal.env.observation_space.low)
 
+	## Set up for Nodes
+	elem = Individual()
+	#24 input nodes
+	for i in range(nInput):
+		elem.nodes.append(outGlobal.NewNode(NodeType.INPUT))
+	#1 bias node
+	elem.nodes.append(outGlobal.NewNode(NodeType.BIAS))
+	#4 output nodes
+	for i in range(nOutput):
+		elem.nodes.append(outGlobal.NewNode(NodeType.OUTPUT))
+	## randomly link them
 	for i in range(nIndividuals):
-		## Set up for Nodes
-		elem = Individual()
-		#24 input nodes
-		for i in range(nInput):
-			elem.nodes.append(outGlobal.NewNode(NodeType.INPUT))
-		#1 bias node
-		elem.nodes.append(outGlobal.NewNode(NodeType.BIAS))
-		#4 output nodes
-		for i in range(nOutput):
-			elem.nodes.append(outGlobal.NewNode(NodeType.OUTPUT))
-		## randomly link them
-		InitLinks(elem, outGlobal)
+		e = copy.copy(elem)
+		InitLinks(e, outGlobal)
 		## Push to list of individuals
-		outGlobal.individuals.append(elem)
+		outGlobal.individuals.append(e)
 	return outGlobal
 
 ## runs the Generation and get the scores
@@ -66,13 +68,23 @@ def RunGen(gl: Global):
 		## just get the high score for now
 		maxScore = -999.0
 		observed = gl.env.reset()
+
+		neuralStruct = quentin.CreateNeuralStructure(indi)
+		outputNids = []
+		for n in indi.nodes:
+			if(n.nodeType == NodeType.OUTPUT):
+				outputNids.append(n.nid)
+
 		## Run till the end of the world
 		t = 0
 		while True:
 			t += 1
 			gl.env.render()
-			#get action here
-			action = gl.env.action_space.sample()
+			
+			action = quentin.ComputeOutputs(neuralStruct, outputNids, observed)
+			print (action)
+			#gl.env.action_space.sample()
+
 			observed, reward, done, info = gl.env.step(action)
 			if reward > maxScore:
 				maxScore = reward

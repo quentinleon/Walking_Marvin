@@ -1,52 +1,63 @@
-import gym
+from gym import spaces
 import numpy as np
 from structures import Individual, Node, NodeType, Link
 
 class Dependency:
 	nid = 0
 	weight = 0.0
+	def __init__(self, i, w):
+		self.nid = i
+		self.weight = w
 
 class LogicalNode:
 	preComputed = False
 	cachedOutput = 0
 	dependencies = []
 
+	def addDependency(self, d):
+		self.dependencies.append(d)
+
 	def setCache(self, n):
 		self.cachedOutput = n
 		self.preComputed = True
 
-	def getOutput(self):
+	def getOutput(self, nodemap):
 		if not self.preComputed:
-			self.computeNode()
+			self.computeNode(nodemap)
 		return self.cachedOutput
 
-	def computeNode(self):
+	def computeNode(self, nodemap):
 		sum = 0
 		for dep in self.dependencies:
-			sum += nodemap[dep.nid].getOutput() * dep.weight
+			sum += nodemap[dep.nid].getOutput(nodemap) * dep.weight
 		self.setCache(np.tanh(sum))
 
-nodemap = {}
-
-def ComputeOutputs(indiv: Individual, input):
-	#TODO Check that number of input nodes in net matches number of inputs
-	outputNids = []
+def CreateNeuralStructure(indiv: Individual):
+	nodemap = {}
 
 	#read in every node and create a logical node
 	for n in indiv.nodes:
 		nodemap[n.nid] = LogicalNode()
-		#keep track of which nodes are outputs, we'll need to compute them
-		if(n.nodeType == NodeType.OUTPUT):
-			outputNids.append(n.nid)
-		#if it's an input node, set it's value to it's matched input
-		elif (n.nodeType == NodeType.INPUT):
-			nodemap[n.nid].setCache(input[n.nid])
 		#if it's a bias node, set it's value to 1
-		elif(n.nodeType == NodeType.BIAS):
+		if(n.nodeType == NodeType.BIAS):
 			nodemap[n.nid].setCache(1)
 		
+	#read in every link and create dependencies from them
+	for l in indiv.links:
+		if l.enabled:
+			new_dep = Dependency(l.path.start, l.weight)
+			nodemap[l.path.end].addDependency(new_dep)
 
-		
-			
+	return nodemap
 
+def ComputeOutputs(nodemap, outputNids, input):
+	#load inputs
+	for i in range(len(input)):
+		nodemap[i].setCache(input[i])
 
+	#create outputs
+	outputmap = [0] * len(outputNids)
+	for o in range(len(outputNids)):
+		outputmap[o] = nodemap[outputNids[o]].getOutput(nodemap)
+	
+	return outputmap
