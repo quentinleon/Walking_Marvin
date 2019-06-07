@@ -1,5 +1,5 @@
 from structures import *
-import quentin
+from neural_structure import NeuralStructure
 import random
 import copy
 import gym
@@ -69,11 +69,7 @@ def RunGen(gl: Global):
 		maxScore = -999.0
 		observed = gl.env.reset()
 
-		neuralStruct = quentin.CreateNeuralStructure(indi)
-		outputNids = []
-		for n in indi.nodes:
-			if(n.nodeType == NodeType.OUTPUT):
-				outputNids.append(n.nid)
+		neuralStruct = NeuralStructure(indi)
 
 		## Run till the end of the world
 		t = 0
@@ -81,7 +77,7 @@ def RunGen(gl: Global):
 			t += 1
 			gl.env.render()
 			
-			action = quentin.ComputeOutputs(neuralStruct, outputNids, observed)
+			action = neuralStruct.ComputeOutputs(observed)
 			print (action)
 			#gl.env.action_space.sample()
 
