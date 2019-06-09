@@ -2,10 +2,7 @@ import numpy as np
 from structures import Individual, Node, NodeType, Link
 
 class NeuralStructure:
-	nodemap = {}
-	outputNids = []
-
-	def __init__(self, indiv):
+	def __init__(self, indiv, includeDisabled = False):
 		self.nodemap = {}
 		self.outputNids = []
 
@@ -23,18 +20,23 @@ class NeuralStructure:
 			#if it's an input node, mark it as such
 			elif(n.nodeType == NodeType.INPUT):
 				self.nodemap[n.nid].inputVal = True
-			
+
 		#read in every link and create dependencies from them
 		for l in indiv.links:
-			if l.enabled:
-				new_dep = Dependency(l.path.start, l.weight)
-				self.nodemap[l.path.end].addDependency(new_dep)
+			if includeDisabled or l.enabled:
+#				if not l.path.end in self.nodemap:
+#					if not includeDisabled:
+#						raise Exception("neural structure error")
+#					else:
+#						self.nodemap[l.path.end] = LogicalNode()
+				self.nodemap[l.path.end].addDependency(Dependency(l.path.start, l.weight))
 
-	def ComputeOutputs(self, input):
-		#clear the cache
+	def resetCache(self):
 		for _, n in self.nodemap.items():
 			n.cached = False
 
+	def ComputeOutputs(self, input):
+		self.resetCache()
 		#load inputs
 		for i in range(len(input)):
 			self.nodemap[i].setCache(input[i])
@@ -43,8 +45,29 @@ class NeuralStructure:
 		outputmap = [0] * len(self.outputNids)
 		for o in range(len(self.outputNids)):
 			outputmap[o] = self.nodemap[self.outputNids[o]].getOutput(self.nodemap)
-		
+
 		return outputmap
+
+	## bad use of this structure, find a better way
+	## check if it's looping or impossible to calculate
+	def IsNodeValid(self, nid: int):
+		logicalNode = self.nodemap[nid]
+		if logicalNode.inputVal:
+			return True
+		if logicalNode.cached or len(logicalNode.dependencies) == 0:
+			return False
+		logicalNode.cached = True
+		for d in logicalNode.dependencies:
+			if not self.IsNodeValid(d.nid):
+				return False
+		# this is to make it not repeat.
+		logicalNode.inputVal = True
+		return True
+
+
+
+
+
 
 class Dependency:
 	nid = 0
@@ -62,9 +85,12 @@ class LogicalNode:
 	dependencies = []
 
 	def __init__(self):
+		self.inputVal = False
+		self.cached = False
+		self.cachedOutput = 0
 		self.dependencies = []
 
-	def addDependency(self, d):
+	def addDependency(self, d: Dependency):
 		self.dependencies.append(d)
 
 	def setCache(self, n):

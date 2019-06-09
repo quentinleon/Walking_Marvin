@@ -1,23 +1,46 @@
 from enum import Enum
 from typing import Dict, List
 import copy
+import bisect
+import random
 
 class Edge:
 	start = -1
 	end = -1
+	def __init__(self, start: int, end: int):
+		self.start = start
+		self.end = end
 	def __copy__(self):
-		e = Edge()
-		e.start = self.start
-		e.end = self.end
-		return e
+		return Edge(self.start, self.end)
 
 class Link:
 	innovation_num = -1
-	path = Edge()
+	path = Edge(-1, -1)
 	weight = 0.0
 	enabled = True
+	def __init__(self):
+		self.innovation_num = -1
+		self.path = Edge(-1, -1)
+		self.weight = 0.0
+		self.enabled = True
+	def __copy__(self):
+		l = Link()
+		l.innovation_num = self.innovation_num
+		l.path = self.path.__copy__()
+		l.weight = self.weight
+		l.enabled = self.enabled
+		return l
 	def __str__(self):
 		return(f"{self.weight}\n     {self.path.start}\t-> {self.path.end}\n")
+	# operator overloads
+	def __lt__(self, other):
+		return self.innovation_num < other.innovation_num
+	def __gt__(self, other):
+		return self.innovation_num > other.innovation_num
+	def __eq__(self, other):
+		return self.innovation_num == other.innovation_num
+
+
 
 class NodeType(Enum):
 	NONE = 0
@@ -29,16 +52,88 @@ class NodeType(Enum):
 class Node:
 	nid = -1
 	nodeType = NodeType.NONE
+	def __init__(self):
+		self.nid = -1
+		self.nodeType = NodeType.NONE
+	def __copy__(self):
+		n = Node()
+		n.nid = self.nid
+		n.nodeType = self.nodeType
+	# operator overloads
+	def __lt__(self, other):
+		return self.nid < other.nid
+	def __eq__(self, other):
+		return self.nid == other.nid
+
 
 class Individual:
+	## make sure that these two are sorted by their ID
 	nodes = []
 	links = []
+	def __init__(self):
+		self.nodes = []
+		self.links = []
+
 	def __copy__(self):
 		i = Individual()
 		i.nodes = copy.deepcopy(self.nodes)
 		i.links = [] #not copying links.
 		#i.links = copy.deepcopy(self.links)
 		return i
+
+	## use this instead of manually inserting nodes.
+	## it does the error checking for you
+	def InsertNode(self, node: Node):
+		idx = bisect.bisect(self.nodes, node)
+		## if duplicate then panic
+		if idx != len(self.nodes) and self.nodes[idx] == node:
+			raise Exception("duplicate nodes")
+		self.nodes.insert(idx, node)
+
+	def InsertLink(self, link: Link):
+		idx = bisect.bisect(self.links, link)
+		## if duplicate then panic
+		if idx != len(self.links) and self.links[idx] == link:
+			raise Exception("duplicate links")
+		self.links.insert(idx, link)
+
+	def InsertLinkReplace(self, link: Link):
+		idx = bisect.bisect(self.links, link)
+		## if duplicate then dice roll.
+		if idx != len(self.links) and self.links[idx] == link:
+			if random.random() < 0.5:
+				self.links[idx] = link
+		else:
+			self.links.insert(idx, link)
+
+	def PopNode(self, node: Node):
+		idx = bisect.bisect_left(self.nodes, node)
+		if idx == len(self.nodes) or self.nodes[idx] != node:
+			raise Exception("nonode found")
+		self.nodes.pop(idx)
+
+	def PopLink(self, link: Link):
+		idx = bisect.bisect_left(self.links, link)
+		if idx == len(self.links) or self.links[idx] != link:
+			raise Exception("no link found")
+		self.links.pop(idx)
+
+	def IsNodeDuplicate(self, node: Node):
+		idx = bisect.bisect(self.nodes, node)
+		return idx != len(self.nodes) and self.nodes[idx] == node
+
+	def IsLinkDuplicate(self, link: Link):
+		idx = bisect.bisect(self.links, link)
+		return idx != len(self.links) and self.links[idx] == link
+
+class Evaluation:
+	def __init__(self, idx, score):
+		self.idx = idx
+		self.score = score
+	def __lt__(self, other):
+		return self.score < other.score
+	def __str__(self):
+		return(f"{self.score}")
 
 class Global:
 	individuals = []
