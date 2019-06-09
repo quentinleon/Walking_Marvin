@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import neat
 
 gen = neat.InitGen(20, 24, 4)
