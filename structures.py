@@ -97,30 +97,11 @@ class Individual:
 			raise Exception("duplicate links")
 		self.links.insert(idx, link)
 
-	def InsertLinkReplace(self, link: Link):
-		idx = bisect.bisect(self.links, link)
-		## if duplicate then dice roll.
-		if idx != len(self.links) and self.links[idx] == link:
-			if random.random() < 0.5:
-				self.links[idx] = link
-		else:
-			self.links.insert(idx, link)
-
-	def PopNode(self, node: Node):
-		idx = bisect.bisect_left(self.nodes, node)
-		if idx == len(self.nodes) or self.nodes[idx] != node:
-			raise Exception("nonode found")
-		self.nodes.pop(idx)
-
 	def PopLink(self, link: Link):
 		idx = bisect.bisect_left(self.links, link)
 		if idx == len(self.links) or self.links[idx] != link:
 			raise Exception("no link found")
 		self.links.pop(idx)
-
-	def IsNodeDuplicate(self, node: Node):
-		idx = bisect.bisect(self.nodes, node)
-		return idx != len(self.nodes) and self.nodes[idx] == node
 
 	def IsLinkDuplicate(self, link: Link):
 		idx = bisect.bisect(self.links, link)
