@@ -76,15 +76,15 @@ def _mutateShift(indi: Individual):
 	# target link
 	idx = random.randrange(len(indi.links))
 	# random action of three. find a better way later.
-	action = random.randrange(3)
+	action = random.random()
 	# multiply between 0.5 to 1.5
-	if action == 0:
+	if action < 0.5:
 		indi.links[idx].weight *= random.uniform(0.5, 1.5)
 	# switch sign
-	elif action == 1:
+	elif action < 0.7:
 		indi.links[idx].weight *= -1
 	# add x where abs(x) < 1
-	elif action == 2:
+	elif action < 1:
 		indi.links[idx].weight += random.uniform(-1.0, 1.0)
 
 ## mutate n times. Make the sum of rates become 1.

@@ -97,43 +97,34 @@ class Individual:
 			raise Exception("duplicate links")
 		self.links.insert(idx, link)
 
-	def InsertLinkReplace(self, link: Link):
-		idx = bisect.bisect(self.links, link)
-		## if duplicate then dice roll.
-		if idx != len(self.links) and self.links[idx] == link:
-			if random.random() < 0.5:
-				self.links[idx] = link
-		else:
-			self.links.insert(idx, link)
-
-	def PopNode(self, node: Node):
-		idx = bisect.bisect_left(self.nodes, node)
-		if idx == len(self.nodes) or self.nodes[idx] != node:
-			raise Exception("nonode found")
-		self.nodes.pop(idx)
-
 	def PopLink(self, link: Link):
 		idx = bisect.bisect_left(self.links, link)
 		if idx == len(self.links) or self.links[idx] != link:
 			raise Exception("no link found")
 		self.links.pop(idx)
 
-	def IsNodeDuplicate(self, node: Node):
-		idx = bisect.bisect(self.nodes, node)
-		return idx != len(self.nodes) and self.nodes[idx] == node
-
 	def IsLinkDuplicate(self, link: Link):
-		idx = bisect.bisect(self.links, link)
+		idx = bisect.bisect_left(self.links, link)
 		return idx != len(self.links) and self.links[idx] == link
 
 class Evaluation:
-	def __init__(self, idx, score):
-		self.idx = idx
+	def __init__(self, indi: Individual, score: float):
+		self.individual = indi
 		self.score = score
 	def __lt__(self, other):
 		return self.score < other.score
-	def __str__(self):
-		return(f"{self.score}")
+
+class Species:
+	def __init__(self, repre: Evaluation):
+		self.representative = repre.individual
+		self.sharedFitness = repre.score
+		self.members = [repre]
+	def AddMember(self, ev: Evaluation):
+		self.sharedFitness += ev.score
+		self.members.append(ev)
+	def CalcSharedFitness(self):
+		self.sharedFitness /= len(self.members)
+
 
 class Global:
 	individuals = []
@@ -150,6 +141,6 @@ class Global:
 		self.nNodes += 1
 		return node
 	def GetInnovationNum(self, edge: Edge):
-		if not edge in self.innovations:
-			self.innovations[edge] = len(self.innovations)
-		return self.innovations[edge]
+		if not (edge.start, edge.end) in self.innovations:
+			self.innovations[(edge.start, edge.end)] = len(self.innovations)
+		return self.innovations[(edge.start, edge.end)]

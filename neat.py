@@ -58,48 +58,66 @@ def InitGen(nIndividuals: int, nInput: int, nOutput: int):
 
 ## runs the Generation and get the scores
 def RunGen(gl: Global):
+	evaluations = []
 	scores = []
 	i = 0
 	for indi in gl.individuals:
+		print(i)
 		reward = 0
-		maxReward = -999.0
-		deathLaser = -5.0
+		#deathLaser = -1.0
 		observed = gl.env.reset()
 		neuralStruct = NeuralStructure(indi)
 
 		## Run till the end of the world
 		t = 0
-		while deathLaser < reward:
+		while reward - 0.05 * (t - 50) > -100:
 			#gl.env.render()
 			action = neuralStruct.ComputeOutputs(observed)
 			#print (action)
-			if reward > maxReward:
-				maxReward = reward
-			observed, reward, done, info = gl.env.step(action)
+			observed, r, done, info = gl.env.step(action)
+			reward += r
 			if done:
 				#print("Episode finished after {} timesteps".format(t+1))
 				break
 			t += 1
-			deathLaser += 0.03
-		print(maxReward)
-		scores.append(Evaluation(i, maxReward))
+			#deathLaser += 0.0025
+		#print(maxReward)
+
+		scores.append(Evaluation(indi, reward))
+		if done and r != -100:
+			evaluations.append(Evaluation(indi, reward + 300))
+		else:
+			evaluations.append(Evaluation(indi, reward))
 		i += 1
-	return scores
+	return scores, evaluations
+
+def Simulate(gl: Global, indi: Individual):
+	#deathLaser = -1.0
+	reward = 0
+	observed = gl.env.reset()
+	neuralStruct = NeuralStructure(indi)
+	## Run till the end of the world
+	t = 0
+	while reward - 0.05 * (t - 50) > -100:
+		gl.env.render()
+		action = neuralStruct.ComputeOutputs(observed)
+		observed, r, done, info = gl.env.step(action)
+		reward += r
+		if done:
+			break
+		t += 1
+		#deathLaser += 0.0025
 
 ## setup next generation (select, breed, mutate)
-def SetupNextGen(gl: Global, scores: List[Evaluation]):
-	# pick only top 2 and make them fuck
+def SetupNextGen(gl: Global, evals: List[Evaluation], scores: List[Evaluation]):
+	gl.individuals = selection.reproduce(evals, 200)
 	scores.sort(reverse = True)
-	#print (scores[0])
-	#print (scores[1])
-	nextIndi = []
-	for i in range(20):
-		more = random.randrange(0, 3)
-		less = random.randrange(more, 5)
-		top1 = gl.individuals[scores[more].idx]
-		top2 = gl.individuals[scores[less].idx]
-		nextIndi.append(crossover.crossover(top1, top2))
-	gl.individuals = nextIndi
+	Simulate(gl, scores[0].individual)
+	print(scores[0].score)
+	sumVal = 0
+	for ev in scores:
+		sumVal += ev.score
+	print(sumVal / 200)
 	for indi in gl.individuals:
-		mutate.mutate(indi, gl, 7, 0.25, 0.25, 0.25, 0.25)
+		mutate.mutate(indi, gl, 4, 0.2, 0.1, 0.3, 0.4)
 
