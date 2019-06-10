@@ -3,7 +3,7 @@ import neat
 
 gen = neat.InitGen(20, 24, 4)
 
-while True:
+while False:
 	print("-Starting Generation-")
 	scores = neat.RunGen(gen)
 	print("-Setting New Generation-")
