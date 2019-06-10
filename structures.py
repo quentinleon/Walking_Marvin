@@ -3,6 +3,7 @@ from typing import Dict, List
 import copy
 import bisect
 import random
+import jsonpickle
 
 class Edge:
 	start = -1
@@ -144,3 +145,15 @@ class Global:
 		if not (edge.start, edge.end) in self.innovations:
 			self.innovations[(edge.start, edge.end)] = len(self.innovations)
 		return self.innovations[(edge.start, edge.end)]
+	def Save(self, path):
+		data = jsonpickle.encode(self, unpicklable=False)
+		f = open("data.wm", "w+")
+		f.write(data)
+		f.close()
+	def Load(self, path):
+		f = open("data.wm", "r")
+		data = f.read()
+		jsonpickle.decode(data)
+		f.close()
+
+

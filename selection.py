@@ -17,7 +17,7 @@ def reproduce(evaluations: List[Evaluation], nIndividual: int):
 	for ev in evaluations:
 		ev.score = (ev.score - minFitness) / (maxFitness - minFitness)
 	#speciate
-	speciesPool = speciate(evaluations, 15)
+	speciesPool = speciate(evaluations, 13)
 	#cull
 	cullRate = 0.8
 	for species in speciesPool:

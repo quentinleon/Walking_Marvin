@@ -82,6 +82,7 @@ def RunGen(gl: Global):
 
 		scores.append(Evaluation(indi, reward))
 		if done and r != -100:
+			observed = gl.env.reset()
 			evaluations.append(Evaluation(indi, reward + 300))
 		else:
 			evaluations.append(Evaluation(indi, reward))
