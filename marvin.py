@@ -2,10 +2,10 @@
 import neat
 import arguments
 
-args = arguments.getArgs()
-#print (args)
-
 gen = neat.InitGen(200, 24, 4)
+
+args = arguments.getArgs()
+print(args)
 
 while True:
 	print("-Starting Generation-")

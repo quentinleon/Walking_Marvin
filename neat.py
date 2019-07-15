@@ -50,9 +50,6 @@ def InitGen(nIndividuals: int, nInput: int, nOutput: int):
 	for i in range(nIndividuals):
 		e = elem.__copy__()
 		InitLinks(e, outGlobal)
-		#if i == 0:
-			#ns = NeuralStructure(e)
-			#ns.visualize()
 		outGlobal.individuals.append(e)
 	return outGlobal
 
@@ -64,6 +61,7 @@ def RunGen(gl: Global):
 	for indi in gl.individuals:
 		print(i)
 		reward = 0
+		r = 0
 		#deathLaser = -1.0
 		observed = gl.env.reset()
 		neuralStruct = NeuralStructure(indi)
@@ -110,14 +108,14 @@ def Simulate(gl: Global, indi: Individual):
 
 ## setup next generation (select, breed, mutate)
 def SetupNextGen(gl: Global, evals: List[Evaluation], scores: List[Evaluation]):
-	gl.individuals = selection.reproduce(evals, 200)
+	gl.individuals = selection.reproduce(evals, gl.nIndividual)
 	scores.sort(reverse = True)
 	Simulate(gl, scores[0].individual)
 	print(scores[0].score)
 	sumVal = 0
 	for ev in scores:
 		sumVal += ev.score
-	print(sumVal / 200)
+	print(sumVal / gl.nIndividual)
 	for indi in gl.individuals:
 		mutate.mutate(indi, gl, 4, 0.2, 0.1, 0.3, 0.4)
 
