@@ -3,7 +3,7 @@ import neat
 import arguments
 
 args = arguments.getArgs()
-#print (args)
+print (args)
 
 gen = neat.InitGen(200, 24, 4)
 

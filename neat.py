@@ -50,8 +50,8 @@ def InitGen(nIndividuals: int, nInput: int, nOutput: int):
 	for i in range(nIndividuals):
 		e = elem.__copy__()
 		InitLinks(e, outGlobal)
-		#if i == 0:
-			#ns = NeuralStructure(e)
+		if i == 0:
+			ns = NeuralStructure(e)
 			#ns.visualize()
 		outGlobal.individuals.append(e)
 	return outGlobal

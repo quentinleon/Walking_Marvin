@@ -15,10 +15,12 @@ def visualize(ns):
 	fig = plt.figure(figsize=(12, 12))
 
 	for nid, n in nodeLocs.items():
-		c = plt.Circle((n.x, n.y), 0.01)
+		c = plt.Circle( (addMargins(n.x, 0.05), addMargins(n.y, 0.05)), 0.01)
 		fig.add_artist(c)
 	plt.show()
 
+def addMargins(pos, margin):
+	return ((pos * (1 - (2 * margin))) + margin)
 
 def generateTopology(ns):
 	deepestNode = 0
@@ -48,7 +50,7 @@ def generateTopology(ns):
 		y = depth_counts[node_depths[nid]] / float(max_depths[node_depths[nid]])
 		depth_counts[node_depths[nid]] += 1
 		node_locations[nid] = Point(x, y)
-		print(f"node {nid} pos: {node_locations[nid]}")
+		#print(f"node {nid} pos: {node_locations[nid]}")
 
 	return node_locations
 
