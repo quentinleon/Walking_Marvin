@@ -115,7 +115,7 @@ def Simulate(gl: Global, indi: Individual):
 		action = neuralStruct.ComputeOutputs(observed)
 		observed, r, done, info = gl.env.step(action)
 		reward += r
-		print(reward)
+		#print(reward)
 		if done:
 			break
 		t += 1

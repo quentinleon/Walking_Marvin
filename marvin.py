@@ -7,7 +7,7 @@ import gym
 args = arguments.getArgs()
 print(args)
 
-individuals = 50
+individuals = 100
 if args.individuals != None:
 	individuals = args.individuals
 

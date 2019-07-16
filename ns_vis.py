@@ -78,7 +78,7 @@ def generateTopology(ns):
 			deepestNode = node_depths[nid]
 	
 	#set all input nodes to deepest depth and count number of nodes at each depth
-	max_depths = [0] * (deepestNode + 1)
+	max_depths = [0] * (deepestNode + 3)
 	for nid, node in ns.nodemap.items():
 		if node.inputVal:
 			node_depths[nid] = deepestNode
