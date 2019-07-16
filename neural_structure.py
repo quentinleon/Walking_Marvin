@@ -1,5 +1,4 @@
 import numpy as np
-from ns_vis import Visualizer
 from structures import Individual, Node, NodeType, Link
 
 class NeuralStructure:
@@ -64,7 +63,6 @@ class NeuralStructure:
 		# this is to make it not repeat.
 		logicalNode.inputVal = True
 		return True
-
 
 
 
