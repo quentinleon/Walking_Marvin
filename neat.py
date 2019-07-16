@@ -125,7 +125,7 @@ def Simulate(gl: Global, indi: Individual):
 def SetupNextGen(gl: Global, evals: List[Evaluation], scores: List[Evaluation], args):
 	gl.individuals = selection.reproduce(evals, gl.nIndividuals)
 	scores.sort(reverse = True)
-	if args.walk:
+	if not args.trainingmode:
 		Simulate(gl, scores[0].individual)
 	print("BestScore: " + str(scores[0].score))
 	sumVal = 0
