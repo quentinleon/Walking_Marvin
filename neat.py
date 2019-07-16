@@ -26,6 +26,11 @@ def InitLinks(indi: Individual, gl: Global, linkChance: float = 0.2):
 			edge.end += 1
 		edge.start += 1
 
+def LoadGen(path):
+	outGlobal = Global()
+	outGlobal.Load(path)
+	return outGlobal
+
 
 ## Inits Gen for Generation 1
 def InitGen(nIndividuals: int, nInput: int, nOutput: int):
@@ -33,7 +38,7 @@ def InitGen(nIndividuals: int, nInput: int, nOutput: int):
 	outGlobal.nInput = nInput
 	outGlobal.nOutput = nOutput
 	outGlobal.nGen = 1
-	outGlobal.env = gym.make('Marvin-v0')
+	outGlobal.nIndividuals = nIndividuals
 
 	## Set up for Nodes with defaults	.
 	elem = Individual()
@@ -111,14 +116,14 @@ def Simulate(gl: Global, indi: Individual):
 
 ## setup next generation (select, breed, mutate)
 def SetupNextGen(gl: Global, evals: List[Evaluation], scores: List[Evaluation]):
-	gl.individuals = selection.reproduce(evals, gl.nIndividual)
+	gl.individuals = selection.reproduce(evals, gl.nIndividuals)
 	scores.sort(reverse = True)
 	Simulate(gl, scores[0].individual)
 	print(scores[0].score)
 	sumVal = 0
 	for ev in scores:
 		sumVal += ev.score
-	print(sumVal / gl.nIndividual)
+	print(sumVal / gl.nIndividuals)
 	for indi in gl.individuals:
 		mutate.mutate(indi, gl, 4, 0.2, 0.1, 0.3, 0.4)
 

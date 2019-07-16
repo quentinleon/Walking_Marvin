@@ -3,11 +3,9 @@ from typing import Dict, List
 import copy
 import bisect
 import random
-import jsonpickle
+import json
 
 class Edge:
-	start = -1
-	end = -1
 	def __init__(self, start: int, end: int):
 		self.start = start
 		self.end = end
@@ -15,10 +13,6 @@ class Edge:
 		return Edge(self.start, self.end)
 
 class Link:
-	innovation_num = -1
-	path = Edge(-1, -1)
-	weight = 0.0
-	enabled = True
 	def __init__(self):
 		self.innovation_num = -1
 		self.path = Edge(-1, -1)
@@ -51,8 +45,6 @@ class NodeType(Enum):
 	HIDDEN = 4
 
 class Node:
-	nid = -1
-	nodeType = NodeType.NONE
 	def __init__(self):
 		self.nid = -1
 		self.nodeType = NodeType.NONE
@@ -69,8 +61,6 @@ class Node:
 
 class Individual:
 	## make sure that these two are sorted by their ID
-	nodes = []
-	links = []
 	def __init__(self):
 		self.nodes = []
 		self.links = []
@@ -146,14 +136,65 @@ class Global:
 			self.innovations[(edge.start, edge.end)] = len(self.innovations)
 		return self.innovations[(edge.start, edge.end)]
 	def Save(self, path):
-		data = jsonpickle.encode(self, unpicklable=False)
+		p = Packer()
+		tab = 0
+		data = p.packGlobal(self)
 		f = open(path, "w+")
 		f.write(data)
 		f.close()
 	def Load(self, path):
+		p = Packer()
 		f = open(path, "r")
 		data = f.read()
-		jsonpickle.decode(data)
+		self = p.unpackGlobal(data)
 		f.close()
 
+class Packer:
+	def writeLine(self, nTab, line):
+		out = ""
+		for _ in range(nTab):
+			out += '\t'
+		out += line + '\n'
+		return out
+
+	def packGlobal(self, gl: Global):
+		out = ""
+		tab = 0
+		out += self.writeLine(tab, str(len(gl.individuals)))
+		tab += 1
+		for indi in gl.individuals:
+			out += self.writeLine(tab, str(len(indi.nodes)))
+			tab += 1
+			for node in indi.nodes:
+				out += self.writeLine(tab, str(node.nid))
+				out += self.writeLine(tab, str(node.nodeType))
+			tab -= 1
+			out += self.writeLine(tab, str(len(indi.links)))
+			tab += 1
+			for link in indi.links:
+				out += self.writeLine(tab, str(link.innovation_num))
+				tab += 1
+				out += self.writeLine(tab, str(link.path.start))
+				out += self.writeLine(tab, str(link.path.end))
+				tab -= 1
+				out += self.writeLine(tab, str(link.weight))
+				out += self.writeLine(tab, str(link.enabled))
+			tab -= 1
+		tab -= 1
+		out += self.writeLine(tab, str(len(gl.innovations)))
+		tab += 1
+		for k, v in gl.innovations.items():
+			tab += 1
+			out += self.writeLine(tab, str(k[0]))
+			out += self.writeLine(tab, str(k[1]))
+			tab -= 1
+			out += self.writeLine(tab, str(v))
+		tab -= 1
+		out += self.writeLine(tab, str(gl.nInput))
+		out += self.writeLine(tab, str(gl.nOutput))
+		out += self.writeLine(tab, str(gl.nNodes))
+		out += self.writeLine(tab, str(gl.nGen))
+		return out
+	
+	def unpackGlobal(self, data):
 
