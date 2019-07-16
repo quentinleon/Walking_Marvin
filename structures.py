@@ -119,14 +119,16 @@ class Species:
 
 
 class Global:
-	individuals = []
-	innovations = {}
-	nInput = 0
-	nOutput = 0
-	nNodes = 0
-	nGen = 1
-	env = 0
-	nIndividuals = 0
+	def __init__(self):
+		self.individuals = []
+		self.innovations = {}
+		self.nInput = 0
+		self.nOutput = 0
+		self.nNodes = 0
+		self.nGen = 1
+		self.env = 0
+		self.nIndividuals = 0
+
 	def NewNode(self, nodeType: NodeType):
 		node = Node()
 		node.nid = self.nNodes
@@ -143,12 +145,6 @@ class Global:
 		data = p.packGlobal(self)
 		f = open(path, "w+")
 		f.write(data)
-		f.close()
-	def Load(self, path):
-		p = Packer()
-		f = open(path, "r")
-		data = f.read()
-		self = p.unpackGlobal(data)
 		f.close()
 
 class Packer:
@@ -249,4 +245,4 @@ class Packer:
 		out.nNodes = int(self.getline(lines))
 		out.nGen = int(self.getline(lines))
 		out.nIndividuals = int(self.getline(lines))
-		return data
+		return out

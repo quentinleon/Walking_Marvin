@@ -27,8 +27,11 @@ def InitLinks(indi: Individual, gl: Global, linkChance: float = 0.2):
 		edge.start += 1
 
 def LoadGen(path):
-	outGlobal = Global()
-	outGlobal.Load(path)
+	p = Packer()
+	f = open(path, "r")
+	data = f.read()
+	outGlobal = p.unpackGlobal(data)
+	f.close()
 	return outGlobal
 
 
