@@ -59,7 +59,7 @@ def speciate(evaluations, threash: float):
 			speciesPool.append(Species(ev))
 	for species in speciesPool:
 		species.CalcSharedFitness()
-	print(len(speciesPool))
+	print("Number of species in pool: " + str(len(speciesPool)))
 	return speciesPool
 
 def geneticDistance(a: Individual, b: Individual):

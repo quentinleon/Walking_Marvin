@@ -138,6 +138,7 @@ class Global:
 		self.nGen = 1
 		self.env = 0
 		self.nIndividuals = 0
+		self.bestIndi = Individual()
 
 	def NewNode(self, nodeType: NodeType):
 		node = Node()
@@ -172,6 +173,19 @@ class Packer:
 		line = lines[self.i]
 		self.i += 1
 		return line.strip()
+
+	def strToNodeType(self, nodeType):
+		if (nodeType == "NodeType.INPUT"):
+			return NodeType.INPUT
+		elif (nodeType == "NodeType.OUTPUT"):
+			return NodeType.OUTPUT
+		elif (nodeType == "NodeType.BIAS"):
+			return NodeType.BIAS
+		elif (nodeType == "NodeType.HIDDEN"):
+			return NodeType.HIDDEN
+		else:
+			print("invalid loading file")
+			sys.exit()
 
 	def packGlobal(self, gl: Global):
 		out = ""
@@ -211,6 +225,26 @@ class Packer:
 		out += self.writeLine(tab, str(gl.nNodes))
 		out += self.writeLine(tab, str(gl.nGen))
 		out += self.writeLine(tab, str(gl.nIndividuals))
+		#best individual
+		tab += 1
+		out += self.writeLine(tab, str(len(gl.bestIndi.nodes)))
+		tab += 1
+		for node in gl.bestIndi.nodes:
+			out += self.writeLine(tab, str(node.nid))
+			out += self.writeLine(tab, str(node.nodeType))
+		tab -= 1
+		out += self.writeLine(tab, str(len(gl.bestIndi.links)))
+		tab += 1
+		for link in gl.bestIndi.links:
+			out += self.writeLine(tab, str(link.innovation_num))
+			tab += 1
+			out += self.writeLine(tab, str(link.path.start))
+			out += self.writeLine(tab, str(link.path.end))
+			tab -= 1
+			out += self.writeLine(tab, str(link.weight))
+			out += self.writeLine(tab, str(link.enabled))
+		tab -= 1
+		tab -= 1
 		return out
 	
 	def unpackGlobal(self, data):
@@ -224,18 +258,7 @@ class Packer:
 			for _ in range(nNodes):
 				node = Node()
 				node.nid = int(self.getline(lines))
-				nodeType = self.getline(lines)
-				if (nodeType == "NodeType.INPUT"):
-					node.nodeType = NodeType.INPUT
-				elif (nodeType == "NodeType.OUTPUT"):
-					node.nodeType = NodeType.OUTPUT
-				elif (nodeType == "NodeType.BIAS"):
-					node.nodeType = NodeType.BIAS
-				elif (nodeType == "NodeType.HIDDEN"):
-					node.nodeType = NodeType.HIDDEN
-				else:
-					print("invalid loading file")
-					sys.exit()
+				node.nodeType = self.strToNodeType(self.getline(lines))
 				indi.nodes.append(node)
 			nLinks = int(self.getline(lines))
 			for _ in range(nLinks):
@@ -255,4 +278,20 @@ class Packer:
 		out.nNodes = int(self.getline(lines))
 		out.nGen = int(self.getline(lines))
 		out.nIndividuals = int(self.getline(lines))
+		#best individual
+		out.bestIndi = Individual()
+		nNodes = int(self.getline(lines))
+		for _ in range(nNodes):
+			node = Node()
+			node.nid = int(self.getline(lines))
+			node.nodeType = self.strToNodeType(self.getline(lines))
+			out.bestIndi.nodes.append(node)
+		nLinks = int(self.getline(lines))
+		for _ in range(nLinks):
+			link = Link()
+			link.innovation_num = int(self.getline(lines))
+			link.path = Edge(int(self.getline(lines)), int(self.getline(lines)))
+			link.weight = float(self.getline(lines))
+			link.enabled = bool(self.getline(lines))
+			out.bestIndi.links.append(link)
 		return out
