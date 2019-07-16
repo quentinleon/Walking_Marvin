@@ -21,6 +21,9 @@ else:
 	gen = neat.InitGen(individuals, 24, 4)
 
 gen.env = gym.make('Marvin-v0')
+if args.load != None and args.walk:
+	neat.Simulate(gen, gen.bestIndi)
+	sys.exit()
 
 while True:
 	print("-Starting Generation-")
@@ -30,4 +33,6 @@ while True:
 	gen.nGen += 1
 	if args.save != None:
 		gen.Save(args.save)
+	if args.walk:
+		break
 

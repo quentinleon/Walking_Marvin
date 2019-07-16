@@ -115,7 +115,7 @@ def Simulate(gl: Global, indi: Individual):
 		action = neuralStruct.ComputeOutputs(observed)
 		observed, r, done, info = gl.env.step(action)
 		reward += r
-		print(reward)
+		#print(reward)
 		if done:
 			break
 		t += 1
@@ -127,11 +127,12 @@ def SetupNextGen(gl: Global, evals: List[Evaluation], scores: List[Evaluation], 
 	scores.sort(reverse = True)
 	if args.walk:
 		Simulate(gl, scores[0].individual)
-	print(scores[0].score)
+	print("BestScore: " + str(scores[0].score))
 	sumVal = 0
 	for ev in scores:
 		sumVal += ev.score
-	print(sumVal / gl.nIndividuals)
+	print("Average Score: " + str(sumVal / gl.nIndividuals))
+	gl.bestIndi = scores[0].individual
 	for indi in gl.individuals:
 		mutate.mutate(indi, gl, 4, 0.2, 0.2, 0.3, 0.3)
 
