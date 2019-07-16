@@ -1,6 +1,5 @@
 #neural structure visualizer
 import matplotlib.pyplot as plt
-from matplotlib import animation
 import numpy as np
 import random
 import time
@@ -16,20 +15,35 @@ class Point:
 
 class Visualizer:
 	shown = False
+	fig = 0
 	def __init__(self, ns):
 		self.nodeStruct = ns
 		self.topology = generateTopology(self.nodeStruct)
-		self.fig = plt.figure(figsize=(12, 12))
-		if not self.shown:
+		if not Visualizer.shown:
+			Visualizer.fig = plt.figure(figsize=(4, 4))
 			plt.ion()
 			plt.show()
-			self.shown = True
+			Visualizer.shown = True
 
 	def update(self):
-		self.fig.clear()
+		Visualizer.fig.clear()
+		
+		#draw nodes
 		for nid, n in self.topology.items():
-			c = plt.Circle((n.x, n.y), 0.01, color=("#"+''.join([random.choice('0123456789ABCDEF') for j in range(6)])))
-			self.fig.add_artist(c)
+			size = 0.01 if self.nodeStruct.nodemap[nid].inputVal else 0.03
+			amount = np.tanh(abs(self.nodeStruct.nodemap[nid].cachedOutput))
+			colour = (1* amount, 0, 0) if self.nodeStruct.nodemap[nid].cachedOutput < 0 else (0, 1 * amount, 0)
+			c = plt.Circle((n.x, n.y), size, color=colour)
+			Visualizer.fig.add_artist(c)
+
+		#draw edges
+		for tnid, n in self.nodeStruct.nodemap.items():
+			for dep in n.dependencies:
+				toLoc = self.topology[tnid]
+				fromLoc = self.topology[dep.nid]
+				c = plt.Line2D([toLoc.x,fromLoc.x], [toLoc.y,fromLoc.y], linewidth=1.1, color="black")
+				Visualizer.fig.add_artist(c)
+
 		plt.draw()
 		plt.pause(.0001)
 		
@@ -64,7 +78,7 @@ def generateTopology(ns):
 			deepestNode = node_depths[nid]
 	
 	#set all input nodes to deepest depth and count number of nodes at each depth
-	max_depths = [-1] * (deepestNode + 1)
+	max_depths = [0] * (deepestNode + 1)
 	for nid, node in ns.nodemap.items():
 		if node.inputVal:
 			node_depths[nid] = deepestNode
@@ -74,7 +88,7 @@ def generateTopology(ns):
 	depth_counts = [0] * (deepestNode + 1)
 	for nid in sorted(node_depths.keys()):
 		x = ((deepestNode) - node_depths[nid]) / float(deepestNode)
-		y = depth_counts[node_depths[nid]] / float(max_depths[node_depths[nid]])
+		y = (depth_counts[node_depths[nid]] / float(max_depths[node_depths[nid]])) + ((1 / float(max_depths[node_depths[nid]])) / 2)
 		depth_counts[node_depths[nid]] += 1
 		node_locations[nid] = addMargins(x, y, 0.05)
 		#print(f"node {nid} pos: {node_locations[nid]}")

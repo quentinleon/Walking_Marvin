@@ -11,6 +11,10 @@ individuals = 50
 if args.individuals != None:
 	individuals = args.individuals
 
+generations = 10
+if args.generations != None:
+	generations = args.generations
+
 if args.load != None: 
 	gen = neat.LoadGen(args.load)
 else:

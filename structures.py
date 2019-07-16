@@ -144,3 +144,66 @@ class Global:
 		if not (edge.start, edge.end) in self.innovations:
 			self.innovations[(edge.start, edge.end)] = len(self.innovations)
 		return self.innovations[(edge.start, edge.end)]
+	def Save(self, path):
+		p = Packer()
+		tab = 0
+		data = p.packGlobal(self)
+		f = open(path, "w+")
+		f.write(data)
+		f.close()
+	def Load(self, path):
+		p = Packer()
+		f = open(path, "r")
+		data = f.read()
+		self = p.unpackGlobal(data)
+		f.close()
+
+class Packer:
+	def writeLine(self, nTab, line):
+		out = ""
+		for _ in range(nTab):
+			out += '\t'
+		out += line + '\n'
+		return out
+
+	def packGlobal(self, gl: Global):
+		out = ""
+		tab = 0
+		out += self.writeLine(tab, str(len(gl.individuals)))
+		tab += 1
+		for indi in gl.individuals:
+			out += self.writeLine(tab, str(len(indi.nodes)))
+			tab += 1
+			for node in indi.nodes:
+				out += self.writeLine(tab, str(node.nid))
+				out += self.writeLine(tab, str(node.nodeType))
+			tab -= 1
+			out += self.writeLine(tab, str(len(indi.links)))
+			tab += 1
+			for link in indi.links:
+				out += self.writeLine(tab, str(link.innovation_num))
+				tab += 1
+				out += self.writeLine(tab, str(link.path.start))
+				out += self.writeLine(tab, str(link.path.end))
+				tab -= 1
+				out += self.writeLine(tab, str(link.weight))
+				out += self.writeLine(tab, str(link.enabled))
+			tab -= 1
+		tab -= 1
+		out += self.writeLine(tab, str(len(gl.innovations)))
+		tab += 1
+		for k, v in gl.innovations.items():
+			tab += 1
+			out += self.writeLine(tab, str(k[0]))
+			out += self.writeLine(tab, str(k[1]))
+			tab -= 1
+			out += self.writeLine(tab, str(v))
+		tab -= 1
+		out += self.writeLine(tab, str(gl.nInput))
+		out += self.writeLine(tab, str(gl.nOutput))
+		out += self.writeLine(tab, str(gl.nNodes))
+		out += self.writeLine(tab, str(gl.nGen))
+		return out
+	
+	def unpackGlobal(self, data):
+		return data

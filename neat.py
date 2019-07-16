@@ -8,10 +8,11 @@ import bisect
 import mutate
 import selection
 import crossover
+import arguments
 
 ## Inits Links for clean state individuals
 ## starts with no seed. seed when we need it.
-def InitLinks(indi: Individual, gl: Global, linkChance: float = 0.2):
+def InitLinks(indi: Individual, gl: Global, linkChance: float = 0.07):
 	#random.seed()
 	edge = Edge(0, gl.nInput + 1)
 	while edge.start < gl.nInput:
@@ -57,11 +58,6 @@ def InitGen(nIndividuals: int, nInput: int, nOutput: int):
 	for i in range(nIndividuals):
 		e = elem.__copy__()
 		InitLinks(e, outGlobal)
-		if i == 0:
-			#ns = NeuralStructure(e)
-			#vis = Visualizer(ns)
-			#vis.update()
-			print("done")
 		outGlobal.individuals.append(e)
 	return outGlobal
 
@@ -106,12 +102,15 @@ def Simulate(gl: Global, indi: Individual):
 	reward = 0
 	observed = gl.env.reset()
 	neuralStruct = NeuralStructure(indi)
-	vis = Visualizer(neuralStruct)
+	args = arguments.getArgs()
+	if args.visualize:
+		vis = Visualizer(neuralStruct)
 	## Run till the end of the world
 	t = 0
 	while reward - 0.05 * (t - 50) > -100:
 		gl.env.render()
-		vis.update()
+		if args.visualize:
+			vis.update()
 		action = neuralStruct.ComputeOutputs(observed)
 		observed, r, done, info = gl.env.step(action)
 		reward += r
@@ -131,5 +130,5 @@ def SetupNextGen(gl: Global, evals: List[Evaluation], scores: List[Evaluation]):
 		sumVal += ev.score
 	print(sumVal / gl.nIndividuals)
 	for indi in gl.individuals:
-		mutate.mutate(indi, gl, 4, 0.2, 0.1, 0.3, 0.4)
+		mutate.mutate(indi, gl, 4, 0.2, 0.2, 0.3, 0.3)
 
