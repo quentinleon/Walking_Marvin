@@ -134,5 +134,5 @@ def SetupNextGen(gl: Global, evals: List[Evaluation], scores: List[Evaluation], 
 	print("Average Score: " + str(sumVal / gl.nIndividuals))
 	gl.bestIndi = scores[0].individual
 	for indi in gl.individuals:
-		mutate.mutate(indi, gl, 4, 0.2, 0.2, 0.3, 0.3)
+		mutate.mutate(indi, gl, 4, 0.1, 0.1, 0.2, 0.6)
 

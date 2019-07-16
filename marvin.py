@@ -10,6 +10,8 @@ print(args)
 individuals = 100
 if args.individuals != None:
 	individuals = args.individuals
+elif args.load == None and args.walk:
+	individuals = 1
 
 generations = 10
 if args.generations != None:

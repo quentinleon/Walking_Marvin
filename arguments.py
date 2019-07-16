@@ -5,6 +5,8 @@ def getArgs():
 
 	parser.add_argument("-w", "--walk", action="store_true",
 						help="display only walking process")
+	parser.add_argument("-t", "--trainingmode", action="store_true",
+						help="skips showing any gui to improve training speed")
 	parser.add_argument("-v", "--visualize", action="store_true",
 						help="visualize the neural net structure when walking")
 	parser.add_argument("-i", "--individuals", type=int,
