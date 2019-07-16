@@ -3,13 +3,25 @@ import neat
 import arguments
 import sys
 import gym
+
 args = arguments.getArgs()
 print(args)
+
+individuals = 50
+if args.individuals != None:
+	individuals = args.individuals
+
+generations = 10
+if args.generations != None:
+	generations = args.generations
+
 if args.load != None: 
 	gen = neat.LoadGen(args.load)
 else:
-	gen = neat.InitGen(200, 24, 4)
+	gen = neat.InitGen(individuals, 24, 4)
+
 gen.env = gym.make('Marvin-v0')
+
 while True:
 	print("-Starting Generation-")
 	scores, evals = neat.RunGen(gen)

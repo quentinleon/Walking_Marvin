@@ -7,6 +7,8 @@ import json
 import sys
 
 class Edge:
+	start = -1
+	end = -1
 	def __init__(self, start: int, end: int):
 		self.start = start
 		self.end = end
@@ -14,6 +16,10 @@ class Edge:
 		return Edge(self.start, self.end)
 
 class Link:
+	innovation_num = -1
+	path = Edge(-1, -1)
+	weight = 0.0
+	enabled = True
 	def __init__(self):
 		self.innovation_num = -1
 		self.path = Edge(-1, -1)
@@ -46,6 +52,8 @@ class NodeType(Enum):
 	HIDDEN = 4
 
 class Node:
+	nid = -1
+	nodeType = NodeType.NONE
 	def __init__(self):
 		self.nid = -1
 		self.nodeType = NodeType.NONE
@@ -62,6 +70,8 @@ class Node:
 
 class Individual:
 	## make sure that these two are sorted by their ID
+	nodes = []
+	links = []
 	def __init__(self):
 		self.nodes = []
 		self.links = []
