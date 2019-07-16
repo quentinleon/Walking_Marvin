@@ -84,15 +84,15 @@ def RunGen(gl: Global):
 			action = neuralStruct.ComputeOutputs(observed)
 			#print (action)
 			observed, r, done, info = gl.env.step(action)
-			reward += r
 			if done:
 				#print("Episode finished after {} timesteps".format(t+1))
 				break
+			reward += r
 			t += 1
 			#deathLaser += 0.0025
 		#print(maxReward)
 
-		scores.append(Evaluation(indi, reward))
+		scores.append(Evaluation(indi, reward + r))
 		evaluations.append(Evaluation(indi, reward))
 		i += 1
 	return scores, evaluations
@@ -103,12 +103,14 @@ def Simulate(gl: Global, indi: Individual):
 	observed = gl.env.reset()
 	neuralStruct = NeuralStructure(indi)
 	## Run till the end of the world
+	r = 0
 	t = 0
 	while reward - 0.05 * (t - 50) > -100:
 		gl.env.render()
 		action = neuralStruct.ComputeOutputs(observed)
 		observed, r, done, info = gl.env.step(action)
 		reward += r
+		print(reward)
 		if done:
 			break
 		t += 1
