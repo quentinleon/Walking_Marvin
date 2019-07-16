@@ -93,10 +93,7 @@ def RunGen(gl: Global):
 		#print(maxReward)
 
 		scores.append(Evaluation(indi, reward))
-		if done and r != -100:
-			evaluations.append(Evaluation(indi, reward + 300))
-		else:
-			evaluations.append(Evaluation(indi, reward))
+		evaluations.append(Evaluation(indi, reward))
 		i += 1
 	return scores, evaluations
 
