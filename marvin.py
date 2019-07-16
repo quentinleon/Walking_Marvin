@@ -2,6 +2,7 @@
 import neat
 import arguments
 import sys
+import gym
 args = arguments.getArgs()
 print(args)
 if args.load != None: 

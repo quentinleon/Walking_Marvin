@@ -197,4 +197,4 @@ class Packer:
 		return out
 	
 	def unpackGlobal(self, data):
-
+		return data
