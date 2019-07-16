@@ -1,5 +1,5 @@
 import numpy as np
-import ns_vis
+from ns_vis import Visualizer
 from structures import Individual, Node, NodeType, Link
 
 class NeuralStructure:
@@ -65,8 +65,6 @@ class NeuralStructure:
 		logicalNode.inputVal = True
 		return True
 
-	def visualize(self):
-		ns_vis.visualize(self)
 
 
 

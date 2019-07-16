@@ -1,5 +1,9 @@
 #neural structure visualizer
 import matplotlib.pyplot as plt
+from matplotlib import animation
+import numpy as np
+import random
+import time
 
 class Point:
 	x = 0.0
@@ -10,17 +14,40 @@ class Point:
 	def __str__(self):
 		return (f"({round(self.x, 2)}, {round(self.y, 2)})")
 
+class Visualizer:
+	shown = False
+	def __init__(self, ns):
+		self.nodeStruct = ns
+		self.topology = generateTopology(self.nodeStruct)
+		self.fig = plt.figure(figsize=(12, 12))
+		if not self.shown:
+			plt.ion()
+			plt.show()
+			self.shown = True
+
+	def update(self):
+		self.fig.clear()
+		for nid, n in self.topology.items():
+			c = plt.Circle((n.x, n.y), 0.01, color=("#"+''.join([random.choice('0123456789ABCDEF') for j in range(6)])))
+			self.fig.add_artist(c)
+		plt.draw()
+		plt.pause(.0001)
+		
+	def close(self):
+		print("close")
+		plt.close()
+
 def visualize(ns):
 	nodeLocs = generateTopology(ns)
-	fig = plt.figure(figsize=(12, 12))
+	fig = plt.figure(figsize=(10, 10))
 
 	for nid, n in nodeLocs.items():
-		c = plt.Circle( (addMargins(n.x, 0.05), addMargins(n.y, 0.05)), 0.01)
+		c = plt.Circle((n.x, n.y), 0.01)
 		fig.add_artist(c)
 	plt.show()
 
-def addMargins(pos, margin):
-	return ((pos * (1 - (2 * margin))) + margin)
+def addMargins(x, y, margin):
+	return Point(((x * (1 - (2 * margin))) + margin) , ((y * (1 - (2 * margin))) + margin))
 
 def generateTopology(ns):
 	deepestNode = 0
@@ -49,7 +76,7 @@ def generateTopology(ns):
 		x = ((deepestNode) - node_depths[nid]) / float(deepestNode)
 		y = depth_counts[node_depths[nid]] / float(max_depths[node_depths[nid]])
 		depth_counts[node_depths[nid]] += 1
-		node_locations[nid] = Point(x, y)
+		node_locations[nid] = addMargins(x, y, 0.05)
 		#print(f"node {nid} pos: {node_locations[nid]}")
 
 	return node_locations

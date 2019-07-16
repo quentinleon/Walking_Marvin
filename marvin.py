@@ -5,7 +5,7 @@ import arguments
 args = arguments.getArgs()
 print (args)
 
-gen = neat.InitGen(200, 24, 4)
+gen = neat.InitGen(20, 24, 4)
 
 while True:
 	print("-Starting Generation-")

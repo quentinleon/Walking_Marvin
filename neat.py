@@ -1,7 +1,9 @@
 from structures import *
 from neural_structure import NeuralStructure
+from ns_vis import Visualizer
 import random
 import gym
+import time
 import bisect
 import mutate
 import selection
@@ -51,8 +53,10 @@ def InitGen(nIndividuals: int, nInput: int, nOutput: int):
 		e = elem.__copy__()
 		InitLinks(e, outGlobal)
 		if i == 0:
-			ns = NeuralStructure(e)
-			#ns.visualize()
+			#ns = NeuralStructure(e)
+			#vis = Visualizer(ns)
+			#vis.update()
+			print("done")
 		outGlobal.individuals.append(e)
 	return outGlobal
 
@@ -96,10 +100,12 @@ def Simulate(gl: Global, indi: Individual):
 	reward = 0
 	observed = gl.env.reset()
 	neuralStruct = NeuralStructure(indi)
+	vis = Visualizer(neuralStruct)
 	## Run till the end of the world
 	t = 0
 	while reward - 0.05 * (t - 50) > -100:
 		gl.env.render()
+		vis.update()
 		action = neuralStruct.ComputeOutputs(observed)
 		observed, r, done, info = gl.env.step(action)
 		reward += r
