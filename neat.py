@@ -115,10 +115,11 @@ def Simulate(gl: Global, indi: Individual):
 		#deathLaser += 0.0025
 
 ## setup next generation (select, breed, mutate)
-def SetupNextGen(gl: Global, evals: List[Evaluation], scores: List[Evaluation]):
+def SetupNextGen(gl: Global, evals: List[Evaluation], scores: List[Evaluation], args):
 	gl.individuals = selection.reproduce(evals, gl.nIndividuals)
 	scores.sort(reverse = True)
-	Simulate(gl, scores[0].individual)
+	if args.walk:
+		Simulate(gl, scores[0].individual)
 	print(scores[0].score)
 	sumVal = 0
 	for ev in scores:

@@ -14,7 +14,7 @@ while True:
 	print("-Starting Generation-")
 	scores, evals = neat.RunGen(gen)
 	print("-Setting New Generation-")
-	neat.SetupNextGen(gen, evals, scores)
+	neat.SetupNextGen(gen, evals, scores, args)
 	gen.nGen += 1
 	if args.save != None:
 		gen.Save(args.save)

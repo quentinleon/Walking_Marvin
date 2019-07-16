@@ -4,6 +4,7 @@ import copy
 import bisect
 import random
 import json
+import sys
 
 class Edge:
 	def __init__(self, start: int, end: int):
@@ -125,6 +126,7 @@ class Global:
 	nNodes = 0
 	nGen = 1
 	env = 0
+	nIndividuals = 0
 	def NewNode(self, nodeType: NodeType):
 		node = Node()
 		node.nid = self.nNodes
@@ -156,6 +158,14 @@ class Packer:
 			out += '\t'
 		out += line + '\n'
 		return out
+
+	def getline(self, lines):
+		if self.i >= len(lines):
+			print("invalid file load")
+			sys.exit()
+		line = lines[self.i]
+		self.i += 1
+		return line.strip()
 
 	def packGlobal(self, gl: Global):
 		out = ""
@@ -194,7 +204,49 @@ class Packer:
 		out += self.writeLine(tab, str(gl.nOutput))
 		out += self.writeLine(tab, str(gl.nNodes))
 		out += self.writeLine(tab, str(gl.nGen))
+		out += self.writeLine(tab, str(gl.nIndividuals))
 		return out
 	
 	def unpackGlobal(self, data):
+		out = Global()
+		self.i = 0
+		lines = data.splitlines()
+		nIndividuals = int(self.getline(lines))
+		for _ in range(nIndividuals):
+			indi = Individual()
+			nNodes = int(self.getline(lines))
+			for _ in range(nNodes):
+				node = Node()
+				node.nid = int(self.getline(lines))
+				nodeType = self.getline(lines)
+				if (nodeType == "NodeType.INPUT"):
+					node.nodeType = NodeType.INPUT
+				elif (nodeType == "NodeType.OUTPUT"):
+					node.nodeType = NodeType.OUTPUT
+				elif (nodeType == "NodeType.BIAS"):
+					node.nodeType = NodeType.BIAS
+				elif (nodeType == "NodeType.HIDDEN"):
+					node.nodeType = NodeType.HIDDEN
+				else:
+					print("invalid loading file")
+					sys.exit()
+				indi.nodes.append(node)
+			nLinks = int(self.getline(lines))
+			for _ in range(nLinks):
+				link = Link()
+				link.innovation_num = int(self.getline(lines))
+				link.path = Edge(int(self.getline(lines)), int(self.getline(lines)))
+				link.weight = float(self.getline(lines))
+				link.enabled = bool(self.getline(lines))
+				indi.links.append(link)
+			out.individuals.append(indi)
+		nInnovations = int(self.getline(lines))
+		for _ in range(nInnovations):
+			pair = (int(self.getline(lines)), int(self.getline(lines)))
+			out.innovations[pair] = int(self.getline(lines))
+		out.nInput = int(self.getline(lines))
+		out.nOutput = int(self.getline(lines))
+		out.nNodes = int(self.getline(lines))
+		out.nGen = int(self.getline(lines))
+		out.nIndividuals = int(self.getline(lines))
 		return data
