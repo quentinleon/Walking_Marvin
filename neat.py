@@ -79,7 +79,7 @@ def RunGen(gl: Global):
 
 		## Run till the end of the world
 		t = 0
-		while reward - 0.05 * (t - 50) > -100:
+		while reward - 0.2 * (t - 30) > -100: #0.05 50
 			#gl.env.render()
 			action = neuralStruct.ComputeOutputs(observed)
 			#print (action)
@@ -108,14 +108,15 @@ def Simulate(gl: Global, indi: Individual):
 	## Run till the end of the world
 	r = 0
 	t = 0
-	while reward - 0.05 * (t - 50) > -100:
+	while reward - 0.2 * (t - 30) > -100:
 		gl.env.render()
 		if args.visualize:
 			vis.update()
 		action = neuralStruct.ComputeOutputs(observed)
 		observed, r, done, info = gl.env.step(action)
 		reward += r
-		#print(reward)
+		if args.debug:
+			print(reward)
 		if done:
 			break
 		t += 1
@@ -134,5 +135,5 @@ def SetupNextGen(gl: Global, evals: List[Evaluation], scores: List[Evaluation], 
 	print("Average Score: " + str(sumVal / gl.nIndividuals))
 	gl.bestIndi = scores[0].individual
 	for indi in gl.individuals:
-		mutate.mutate(indi, gl, 4, 0.1, 0.1, 0.2, 0.6)
+		mutate.mutate(indi, gl, 2, 0.1, 0.1, 0.2, 0.6)
 
