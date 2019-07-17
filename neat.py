@@ -108,7 +108,7 @@ def Simulate(gl: Global, indi: Individual):
 	## Run till the end of the world
 	r = 0
 	t = 0
-	while reward - 0.2 * (t - 30) > -100:
+	while reward - 0.05 * (t - 50) > -100:
 		gl.env.render()
 		if args.visualize:
 			vis.update()
